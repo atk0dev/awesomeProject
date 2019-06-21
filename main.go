@@ -1,9 +1,9 @@
 package main
 
 import (
-	"awesomeProject/controllers"
-	"awesomeProject/driver"
-	"awesomeProject/model"
+	"./controllers"
+	"./model"
+	"./driver"
 	"database/sql"
 	"log"
 	"net/http"

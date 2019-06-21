@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"awesomeProject/model"
+	"../model"
 	"database/sql"
 	"log"
 )

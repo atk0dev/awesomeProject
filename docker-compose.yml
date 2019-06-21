@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ELEPHANTSQL_URL: postgres://devuser:pass123@db:5432/devdb?sslmode=disable
+    networks:
+      - backend
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: devdb
+      POSTGRES_USER: devuser
+      POSTGRES_PASSWORD: pass123
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
+    networks:
+      - backend
+
+networks:
+  backend:

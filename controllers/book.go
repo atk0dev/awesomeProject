@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"awesomeProject/model"
-	bookRepository "awesomeProject/repository"
+	"../model"
+	bookRepository "../repository"
 	"database/sql"
 	"encoding/json"
 	"log"
