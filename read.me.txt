@@ -1,0 +1,1 @@
+docker build -t bookstore:0.1 . -f Dockerfile
