@@ -63,7 +63,14 @@ func (c Books) AddBook(db *sql.DB) http.HandlerFunc {
 		bookRepo := bookRepository.BookRepository{}
 		bookID = bookRepo.AddBook(db, book)
 
-		json.NewEncoder(w).Encode(bookID)
+		response := model.IdResponse{
+			Id: bookID,
+			Message: "Book has been created",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		json.NewEncoder(w).Encode(response)
 	}
 }
 
@@ -75,7 +82,14 @@ func (c Books) UpdateBook(db *sql.DB) http.HandlerFunc {
 		bookRepo := bookRepository.BookRepository{}
 		rowsUpdated := bookRepo.UpdateBook(db, book)
 
-		json.NewEncoder(w).Encode(rowsUpdated)
+		response := model.IdResponse{
+			Id: rowsUpdated,
+			Message: "Item updated",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		json.NewEncoder(w).Encode(response)
 	}
 }
 
@@ -89,7 +103,14 @@ func (c Books) RemoveBook(db *sql.DB) http.HandlerFunc {
 
 		rowsDeleted := bookRepo.RemoveBook(db, id)
 
-		json.NewEncoder(w).Encode(rowsDeleted)
+		response := model.IdResponse{
+			Id: rowsDeleted,
+			Message: "Item deleted",
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		json.NewEncoder(w).Encode(response)
 	}
 }
 
