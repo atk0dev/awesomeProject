@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"../model"
@@ -12,10 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-
-var books []model.Book
-
-type Controller struct{}
+type Books struct{}
 
 func logFatal(err error) {
 	if err != nil {
@@ -23,24 +20,26 @@ func logFatal(err error) {
 	}
 }
 
-func (c Controller) GetBooks(db *sql.DB) http.HandlerFunc {
+func (c Books) GetBooks(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book model.Book
-		books = []model.Book{}
+
+		books := []model.Book{}
 		bookRepo := bookRepository.BookRepository{}
 
 		books = bookRepo.GetBooks(db, book, books)
+
+		w.Header().Set("Content-Type", "application/json")
 
 		json.NewEncoder(w).Encode(books)
 	}
 }
 
-func (c Controller) GetBook(db *sql.DB) http.HandlerFunc {
+func (c Books) GetBook(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book model.Book
 		params := mux.Vars(r)
 
-		books = []model.Book{}
 		bookRepo := bookRepository.BookRepository{}
 
 		id, err := strconv.Atoi(params["id"])
@@ -48,11 +47,13 @@ func (c Controller) GetBook(db *sql.DB) http.HandlerFunc {
 
 		book = bookRepo.GetBook(db, book, id)
 
+		w.Header().Set("Content-Type", "application/json")
+
 		json.NewEncoder(w).Encode(book)
 	}
 }
 
-func (c Controller) AddBook(db *sql.DB) http.HandlerFunc {
+func (c Books) AddBook(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book model.Book
 		var bookID int
@@ -66,7 +67,7 @@ func (c Controller) AddBook(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {
+func (c Books) UpdateBook(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var book model.Book
 		json.NewDecoder(r.Body).Decode(&book)
@@ -78,7 +79,7 @@ func (c Controller) UpdateBook(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func (c Controller) RemoveBook(db *sql.DB) http.HandlerFunc {
+func (c Books) RemoveBook(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 		bookRepo := bookRepository.BookRepository{}

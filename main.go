@@ -1,19 +1,14 @@
 package main
 
 import (
-	"./controllers"
-	"./model"
+	"./controller"
 	"./driver"
-	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/subosito/gotenv"
-
 )
-var books []model.Book
-var db *sql.DB
 
 func init() {
 	gotenv.Load()
@@ -44,10 +39,10 @@ func (s *WithCORS) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	db = driver.ConnectDB()
+	db := driver.ConnectDB()
 	router := mux.NewRouter()
 
-	controller := controllers.Controller{}
+	controller := controller.Books{}
 
 	router.HandleFunc("/books", controller.GetBooks(db)).Methods("GET")
 	router.HandleFunc("/books/{id}", controller.GetBook(db)).Methods("GET")
