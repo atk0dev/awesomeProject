@@ -63,14 +63,10 @@ func (c Books) AddBook(db *sql.DB) http.HandlerFunc {
 		bookRepo := bookRepository.BookRepository{}
 		bookID = bookRepo.AddBook(db, book)
 
-		response := model.IdResponse{
-			Id: bookID,
-			Message: "Book has been created",
-		}
-
+		book.Id = bookID
 		w.Header().Set("Content-Type", "application/json")
-
-		json.NewEncoder(w).Encode(response)
+		w.Header().Set("location",  "/books/" + strconv.Itoa(bookID))
+		json.NewEncoder(w).Encode(book)
 	}
 }
 
@@ -80,16 +76,9 @@ func (c Books) UpdateBook(db *sql.DB) http.HandlerFunc {
 		json.NewDecoder(r.Body).Decode(&book)
 
 		bookRepo := bookRepository.BookRepository{}
-		rowsUpdated := bookRepo.UpdateBook(db, book)
+		_ = bookRepo.UpdateBook(db, book)
 
-		response := model.IdResponse{
-			Id: rowsUpdated,
-			Message: "Item updated",
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-
-		json.NewEncoder(w).Encode(response)
+		w.WriteHeader(204)
 	}
 }
 
@@ -101,16 +90,9 @@ func (c Books) RemoveBook(db *sql.DB) http.HandlerFunc {
 		id, err := strconv.Atoi(params["id"])
 		logFatal(err)
 
-		rowsDeleted := bookRepo.RemoveBook(db, id)
+		_ = bookRepo.RemoveBook(db, id)
 
-		response := model.IdResponse{
-			Id: rowsDeleted,
-			Message: "Item deleted",
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-
-		json.NewEncoder(w).Encode(response)
+		w.WriteHeader(204)
 	}
 }
 
