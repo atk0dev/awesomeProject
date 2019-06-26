@@ -8,9 +8,11 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/subosito/gotenv"
 )
@@ -44,6 +46,9 @@ func main() {
 	db := driver.ConnectDB()
 	router := mux.NewRouter()
 
+	indexController := controller.Index{}
+	router.HandleFunc("/", indexController.GetIndex()).Methods("GET")
+
 	booksController := controller.Books{}
 	router.HandleFunc("/books", TokenVerifyMiddleWare(booksController.GetBooks(db))).Methods("GET")
 	router.HandleFunc("/books/{id}", TokenVerifyMiddleWare(booksController.GetBook(db))).Methods("GET")
@@ -51,9 +56,19 @@ func main() {
 	router.HandleFunc("/books", TokenVerifyMiddleWare(booksController.UpdateBook(db))).Methods("PUT")
 	router.HandleFunc("/books/{id}", TokenVerifyMiddleWare(booksController.RemoveBook(db))).Methods("DELETE")
 
+	logFile, err := os.OpenFile("server.log",  os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("error starting logging server : ", err)
+		return
+	}
+
 	usersController := controller.Users{}
-	router.HandleFunc("/signup", usersController.Signup(db)).Methods("POST")
-	router.HandleFunc("/login", usersController.Login(db)).Methods("POST")
+	router.Handle("/signup", handlers.LoggingHandler(logFile, http.HandlerFunc(usersController.Signup(db)))).Methods("POST")
+	router.Handle("/login", handlers.LoggingHandler(logFile, http.HandlerFunc(usersController.Login(db)))).Methods("POST")
+	//router.HandleFunc("/signup", usersController.Signup(db)).Methods("POST")
+	//router.HandleFunc("/login", usersController.Login(db)).Methods("POST")
+
+	router.PathPrefix("/").Handler(http.StripPrefix("/static",  http.FileServer(http.Dir("static/"))))
 
 	port := 8000
 	log.Println("Starting to listen on port ", port)
